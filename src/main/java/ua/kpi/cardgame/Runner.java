@@ -14,12 +14,12 @@ public class Runner {
         connection.close();
 
         PSQLUserDAO psqlUserDAO = new PSQLUserDAO();
-        User test = psqlUserDAO.getUserById(8);
-        User obj = psqlUserDAO.createUser("misha", "password222");
-        psqlUserDAO.deleteUserById(obj.getUserId());
+//        User test = psqlUserDAO.getUserById(8);
+        User obj = psqlUserDAO.createUser("artem", "password222");
+//        psqlUserDAO.deleteUserById(obj.getUserId());
         System.out.println(psqlUserDAO.getAllUsers());
         System.out.println(psqlUserDAO.getUsersWithRateBetween(0, 10));
-        psqlUserDAO.updateUserRate(test, 15);
+        psqlUserDAO.updateUserRate(obj, 15);
         System.out.println(psqlUserDAO.getUsersWithRateBetween(1, 10));
         System.out.println(psqlUserDAO.getAllUsers());
         System.out.println("ok");

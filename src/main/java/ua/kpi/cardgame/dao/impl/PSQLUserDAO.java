@@ -12,10 +12,10 @@ import java.util.List;
 
 public class PSQLUserDAO implements IUserDAO {
     private final PSQLController controller;
-    private static final String SELECT = "SELECT * FROM \"card-game\".users";
-    private static final String INSERT = "INSERT INTO \"card-game\".users (login, password) VALUES (?, ?)";
-    private static final String UPDATE_RATE = "UPDATE \"card-game\".users SET rate = ? WHERE user_id = ?";
-    private static final String DELETE = "DELETE FROM \"card-game\".users WHERE user_id = ?";
+    private static final String SELECT = "SELECT * FROM cardGame.users";
+    private static final String INSERT = "INSERT INTO cardGame.users (login, password) VALUES (?, ?)";
+    private static final String UPDATE_RATE = "UPDATE cardGame.users SET rate = ? WHERE user_id = ?";
+    private static final String DELETE = "DELETE FROM cardGame.users WHERE user_id = ?";
 
     public PSQLUserDAO() {
         controller = new PSQLController();
@@ -63,6 +63,8 @@ public class PSQLUserDAO implements IUserDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            controller.closePreparedStatement(ps);
         }
 
         return user;
@@ -77,6 +79,8 @@ public class PSQLUserDAO implements IUserDAO {
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            controller.closePreparedStatement(ps);
         }
     }
 
@@ -94,6 +98,8 @@ public class PSQLUserDAO implements IUserDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            controller.closePreparedStatement(ps);
         }
 
         return false;
@@ -115,6 +121,8 @@ public class PSQLUserDAO implements IUserDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            controller.closePreparedStatement(ps);
         }
 
         return users;
@@ -136,6 +144,8 @@ public class PSQLUserDAO implements IUserDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            controller.closePreparedStatement(ps);
         }
 
         return users;
