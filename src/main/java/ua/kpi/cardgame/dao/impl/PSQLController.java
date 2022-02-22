@@ -4,10 +4,11 @@ import ua.kpi.cardgame.connection.ConnectionFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class PSQLController {
-    private Connection connection;
+    private final Connection connection;
 
     public PSQLController() {
         connection = ConnectionFactory.getPostgreSQLConnection();
@@ -40,6 +41,42 @@ public class PSQLController {
     public void closePreparedStatement(PreparedStatement ps) {
         try {
             ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void closeResultSet(ResultSet rs) {
+        try {
+            if (rs != null) {
+                rs.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void startTransaction() {
+        try {
+            connection.setAutoCommit(false);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void rollbackTransaction() {
+        try {
+            connection.rollback();
+            connection.setAutoCommit(true);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void commitTransaction() {
+        try {
+            connection.commit();
+            connection.setAutoCommit(true);
         } catch (SQLException e) {
             e.printStackTrace();
         }

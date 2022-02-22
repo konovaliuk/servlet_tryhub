@@ -15,6 +15,7 @@ public class PSQLUserDAO implements IUserDAO {
     private static final String SELECT = "SELECT * FROM cardGame.users";
     private static final String INSERT = "INSERT INTO cardGame.users (login, password) VALUES (?, ?)";
     private static final String UPDATE_RATE = "UPDATE cardGame.users SET rate = ? WHERE user_id = ?";
+    private static final String UPDATE_PASSWORD = "UPDATE cardGame.users SET password = ? WHERE user_id = ?";
     private static final String DELETE = "DELETE FROM cardGame.users WHERE user_id = ?";
 
     public PSQLUserDAO() {
@@ -84,16 +85,14 @@ public class PSQLUserDAO implements IUserDAO {
         }
     }
 
-    @Override
-    public boolean updateUserRate(User user, int rate) {
-        PreparedStatement ps = controller.getPreparedStatement(UPDATE_RATE);
+    private boolean updateUserFiled(String sql, User user, Object field) {
+        PreparedStatement ps = controller.getPreparedStatement(sql);
 
         try {
-            ps.setInt(1, rate);
+            ps.setObject(1, field);
             ps.setInt(2, user.getUserId());
 
             if (ps.executeUpdate() == 1) {
-                user.setRate(rate);
                 return true;
             }
         } catch (SQLException e) {
@@ -106,12 +105,33 @@ public class PSQLUserDAO implements IUserDAO {
     }
 
     @Override
+    public boolean updateUserRate(User user, int rate) {
+        if (updateUserFiled(UPDATE_RATE, user, rate)) {
+            user.setRate(rate);
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean updateUserPassword(User user, String password) {
+        if (updateUserFiled(UPDATE_PASSWORD, user, password)) {
+            user.setPassword(password);
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
     public List<User> getAllUsers() {
-        List<User> users = new ArrayList();
+        List<User> users = new ArrayList<>();
         PreparedStatement ps = controller.getPreparedStatement(SELECT);
+        ResultSet rs = null;
 
         try {
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
 
             while (rs.next()) {
                 users.add(new User(
@@ -122,6 +142,7 @@ public class PSQLUserDAO implements IUserDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
+            controller.closeResultSet(rs);
             controller.closePreparedStatement(ps);
         }
 
@@ -130,11 +151,12 @@ public class PSQLUserDAO implements IUserDAO {
 
     @Override
     public List<User> getUsersWithRateBetween(int from, int to) {
-        List<User> users = new ArrayList();
+        List<User> users = new ArrayList<>();
         PreparedStatement ps = controller.getPreparedStatement(SELECT+" WHERE rate BETWEEN "+from+" and "+to);
+        ResultSet rs = null;
 
         try {
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
 
             while (rs.next()) {
                 users.add(new User(
@@ -145,6 +167,7 @@ public class PSQLUserDAO implements IUserDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
+            controller.closeResultSet(rs);
             controller.closePreparedStatement(ps);
         }
 
