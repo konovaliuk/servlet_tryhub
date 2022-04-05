@@ -1,8 +1,10 @@
 package ua.kpi.cardgame.entities;
 
-import java.sql.Timestamp;
+import org.postgresql.util.PGInterval;
+
 import java.time.Duration;
 import java.util.Objects;
+import org.postgresql.util.PGInterval;
 
 enum EventName {
     DELAY, CHOOSING, VOTING, AUTO_VOTING
@@ -11,14 +13,20 @@ enum EventName {
 public class Event {
     private int eventId;
     private EventName eventName;
-    private Duration eventDuration;
+    private Duration duration;
 
     public Event() { }
 
-    public Event(int eventId, EventName eventName, Duration eventDuration) {
+    public Event(int eventId, String eventName, long duration) {
         this.eventId = eventId;
-        this.eventName = eventName;
-        this.eventDuration = eventDuration;
+        this.eventName = EventName.valueOf(eventName);
+        this.duration =  Duration.ofSeconds(duration);
+    }
+
+    public Event(int eventId, String eventName, PGInterval duration) {
+        this.eventId = eventId;
+        this.eventName = EventName.valueOf(eventName);
+        this.duration =  Duration.ofSeconds((long) (duration.getMinutes() * 60L + duration.getSeconds()));
     }
 
     public int getEventId() { return eventId; }
@@ -29,9 +37,9 @@ public class Event {
 
     public void setEventName(EventName eventName) { this.eventName = eventName; }
 
-    public Duration getEventDuration() { return eventDuration; }
+    public Duration getDuration() { return duration; }
 
-    public void setEventDuration(Duration eventDuration) { this.eventDuration = eventDuration; }
+    public void setDuration(long duration) { this.duration = Duration.ofSeconds(duration); }
 
     @Override
     public boolean equals(Object o) {
@@ -51,7 +59,7 @@ public class Event {
         return "Event{" +
                 "eventId=" + eventId +
                 ", eventName=" + eventName +
-                ", eventDuration=" + eventDuration +
+                ", eventDuration=" + duration +
                 '}';
     }
 }
