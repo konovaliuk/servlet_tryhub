@@ -6,6 +6,7 @@ import ua.kpi.cardgame.dao.impl.PSQLUserOnlineDAO;
 import ua.kpi.cardgame.entities.User;
 
 import java.sql.SQLException;
+import java.sql.SQLOutput;
 
 public class Runner {
     public static void main(String[] args) throws SQLException {
