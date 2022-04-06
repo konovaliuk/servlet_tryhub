@@ -27,16 +27,12 @@ public class PSQLUserCardsDAO implements IUserCardsDAO {
 
     @Override
     public boolean addUserCards(List<UserCard> userCards) throws SQLException {
-        controller.startTransaction();
-
         for (UserCard userCard : userCards) {
             if (!addUserCard(userCard)) {
-                controller.rollbackTransaction();
                 return false;
             }
         }
 
-        controller.commitTransaction();
         return true;
     }
 
