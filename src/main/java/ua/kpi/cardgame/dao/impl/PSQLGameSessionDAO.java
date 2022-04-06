@@ -21,7 +21,7 @@ public class PSQLGameSessionDAO implements GameSessionDAO {
     private static final String DELETE = "DELETE FROM cardGame.game_sessions WHERE session_id = ?";
 
     public PSQLGameSessionDAO() {
-        controller = new PSQLController();
+        controller = PSQLController.getInstance();
     }
 
     @Override
@@ -42,9 +42,10 @@ public class PSQLGameSessionDAO implements GameSessionDAO {
                         rs.getInt(1), stage, leader_id,
                         condition_id, rs.getTimestamp(5), event_id);
             }
+            rs.close();
         }
 
-        controller.closePreparedStatement(ps);
+        ps.close();
 
         return gameSession;
     }
@@ -63,7 +64,8 @@ public class PSQLGameSessionDAO implements GameSessionDAO {
                     gameSessions.getInt(4), gameSessions.getTimestamp(5), gameSessions.getInt(6));
         }
 
-        controller.closePreparedStatement(ps);
+        gameSessions.close();
+        ps.close();
 
         return gameSession;
     }
@@ -75,7 +77,7 @@ public class PSQLGameSessionDAO implements GameSessionDAO {
         ps.setInt(1, id);
         ps.executeUpdate();
 
-        controller.closePreparedStatement(ps);
+        ps.close();
     }
 
     @Override
@@ -89,7 +91,7 @@ public class PSQLGameSessionDAO implements GameSessionDAO {
             session.setStage(stage);
         }
 
-        controller.closePreparedStatement(ps);
+        ps.close();
 
         return stage;
     }
@@ -105,7 +107,7 @@ public class PSQLGameSessionDAO implements GameSessionDAO {
             session.setLeaderId(leaderId);
         }
 
-        controller.closePreparedStatement(ps);
+        ps.close();
 
         return leaderId;
     }
@@ -121,7 +123,7 @@ public class PSQLGameSessionDAO implements GameSessionDAO {
             session.setConditionId(conditionId);
         }
 
-        controller.closePreparedStatement(ps);
+        ps.close();
 
         return conditionId;
     }
@@ -137,7 +139,7 @@ public class PSQLGameSessionDAO implements GameSessionDAO {
             session.setEventId(eventId);
         }
 
-        controller.closePreparedStatement(ps);
+        ps.close();
 
         return eventId;
     }
@@ -156,8 +158,8 @@ public class PSQLGameSessionDAO implements GameSessionDAO {
                     rs.getInt(4), rs.getTimestamp(5), rs.getInt(6)));
             }
 
-        controller.closeResultSet(rs);
-        controller.closePreparedStatement(ps);
+        rs.close();
+        ps.close();
 
         return gameSessions;
     }

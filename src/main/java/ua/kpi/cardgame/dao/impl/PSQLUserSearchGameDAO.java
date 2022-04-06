@@ -16,7 +16,7 @@ public class PSQLUserSearchGameDAO implements UserSearchGameDAO {
     private static final String DELETE = "DELETE FROM cardGame.users_search_game WHERE user_id = ?";
 
     public PSQLUserSearchGameDAO() {
-        controller = new PSQLController();
+        controller = PSQLController.getInstance();
     }
 
     @Override
@@ -26,7 +26,7 @@ public class PSQLUserSearchGameDAO implements UserSearchGameDAO {
         ps.setInt(1, userId);
         ps.executeUpdate();
 
-        controller.closePreparedStatement(ps);
+        ps.close();
     }
 
     @Override
@@ -36,7 +36,7 @@ public class PSQLUserSearchGameDAO implements UserSearchGameDAO {
         ps.setInt(1, userId);
         ps.executeUpdate();
 
-        controller.closePreparedStatement(ps);
+        ps.close();
     }
 
     @Override
@@ -49,8 +49,8 @@ public class PSQLUserSearchGameDAO implements UserSearchGameDAO {
 
         while (rs.next()) {
             usersSearchGame.add(new UserSearchGame(rs.getInt(1), rs.getTimestamp(2)));
-            controller.closeResultSet(rs);
-            controller.closePreparedStatement(ps);
+            rs.close();
+            ps.close();
         }
 
         return usersSearchGame;

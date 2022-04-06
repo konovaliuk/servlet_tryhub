@@ -1,19 +1,19 @@
 package ua.kpi.cardgame.dao.impl;
 
+import org.postgresql.util.PGInterval;
 import ua.kpi.cardgame.dao.interfaces.EventDAO;
 import ua.kpi.cardgame.entities.Event;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.postgresql.util.PGInterval;
 
 public class PSQLEventDAO implements EventDAO {
     private final PSQLController controller;
     private static final String SELECT = "SELECT * FROM cardGame.events";
 
     public PSQLEventDAO() {
-        controller = new PSQLController();
+        controller = PSQLController.getInstance();
     }
 
     public Event getEventById(int eventId) throws SQLException {
@@ -29,7 +29,7 @@ public class PSQLEventDAO implements EventDAO {
             );
         }
 
-        controller.closePreparedStatement(ps);
+        ps.close();
 
         return event;
     }
