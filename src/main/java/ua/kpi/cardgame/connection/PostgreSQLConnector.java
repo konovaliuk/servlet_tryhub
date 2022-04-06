@@ -9,7 +9,7 @@ import java.util.ResourceBundle;
 public class PostgreSQLConnector {
     private static BasicDataSource dataSource;
 
-    private PostgreSQLConnector() {};
+    private PostgreSQLConnector() {}
 
     private static void initDataSource() {
         ResourceBundle resource = ResourceBundle.getBundle("postgres");
@@ -24,14 +24,10 @@ public class PostgreSQLConnector {
     }
 
     public static Connection getConnection() throws SQLException {
-        Connection connection = null;
-
         if (dataSource == null) {
             initDataSource();
         }
 
-        connection = dataSource.getConnection();
-
-        return connection;
+        return dataSource.getConnection();
     }
 }

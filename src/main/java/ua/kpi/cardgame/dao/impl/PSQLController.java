@@ -4,81 +4,46 @@ import ua.kpi.cardgame.connection.ConnectionFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class PSQLController {
-    private final Connection connection;
+    private static PSQLController instance;
+    private Connection connection;
 
-    public PSQLController() {
-        connection = ConnectionFactory.getPostgreSQLConnection();
-    }
+    private PSQLController() {}
 
-    public PreparedStatement getPreparedStatement(String sql) {
-        PreparedStatement ps = null;
-
-        try {
-            ps = connection.prepareStatement(sql);
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public static PSQLController getInstance() {
+        if (instance == null) {
+            instance = new PSQLController();
         }
 
-        return ps;
+        return instance;
     }
 
-    public PreparedStatement getPreparedStatement(String sql, int arg) {
-        PreparedStatement ps = null;
-
-        try {
-            ps = connection.prepareStatement(sql, arg);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return ps;
+    public PreparedStatement getPreparedStatement(String sql) throws SQLException {
+        startTransaction();
+        return connection.prepareStatement(sql);
     }
 
-    public void closePreparedStatement(PreparedStatement ps) {
-        try {
-            ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public PreparedStatement getPreparedStatement(String sql, int arg) throws SQLException {
+        startTransaction();
+        return connection.prepareStatement(sql, arg);
     }
 
-    public void closeResultSet(ResultSet rs) {
-        try {
-            if (rs != null) {
-                rs.close();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public void startTransaction() throws SQLException {
+        if (connection == null || connection.isClosed()) {
+            connection = ConnectionFactory.getPostgreSQLConnection();
         }
+        connection.setAutoCommit(false);
     }
 
-    public void startTransaction() {
-        try {
-            connection.setAutoCommit(false);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public void rollbackTransaction() throws SQLException {
+        connection.rollback();
+        connection.close();
     }
 
-    public void rollbackTransaction() {
-        try {
-            connection.rollback();
-            connection.setAutoCommit(true);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void commitTransaction() {
-        try {
-            connection.commit();
-            connection.setAutoCommit(true);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public void commitTransaction() throws SQLException {
+        connection.commit();
+        connection.close();
     }
 }

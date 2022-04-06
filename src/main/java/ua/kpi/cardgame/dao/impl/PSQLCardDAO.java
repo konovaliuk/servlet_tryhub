@@ -13,150 +13,124 @@ import java.util.List;
 
 public class PSQLCardDAO implements ICardDAO {
     private final PSQLController controller;
+
+    private static final String COLUMN_ID = "card_id";
+    private static final String COLUMN_TYPE = "type";
+    private static final String COLUMN_RESOURCE = "resource";
+
     private static final String SELECT = "SELECT * FROM cardGame.cards";
     private static final String INSERT = "INSERT INTO cardGame.cards (type, resource) VALUES (CAST(? AS card_type), ?)";
     private static final String UPDATE = "UPDATE cardGame.cards SET resource = ? WHERE card_id = ?";
     private static final String DELETE = "DELETE FROM cardGame.cards WHERE card_id = ?";
 
     public PSQLCardDAO() {
-        controller = new PSQLController();
+        controller = PSQLController.getInstance();
     }
 
     @Override
-    public Card getCardById(int id) {
+    public Card getCardById(int id) throws SQLException {
         Card card = null;
+
         PreparedStatement ps = controller.getPreparedStatement(SELECT + " WHERE card_id = ?");
-        ResultSet cards = null;
+        ps.setInt(1, id);
 
-        try {
-            ps.setInt(1, id);
-            cards = ps.executeQuery();
+        ResultSet rs = ps.executeQuery();
 
-            if (cards.next()) {
-                card = new Card(
-                        cards.getInt(1), CardType.valueOf(cards.getString(2).toUpperCase()),
-                        cards.getString(3)
-                );
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            controller.closeResultSet(cards);
-            controller.closePreparedStatement(ps);
+        if (rs.next()) {
+            card = new Card(
+                rs.getInt(COLUMN_ID), CardType.valueOf(rs.getString(COLUMN_TYPE).toUpperCase()),
+                rs.getString(COLUMN_RESOURCE)
+            );
         }
+
+        rs.close();
+        ps.close();
 
         return card;
     }
 
     @Override
-    public Card createCard(CardType type, String resource) {
+    public Card createCard(CardType type, String resource) throws SQLException {
         Card card = null;
+
         PreparedStatement ps = controller.getPreparedStatement(INSERT, Statement.RETURN_GENERATED_KEYS);
-        ResultSet rs = null;
+        ps.setString(1, type.toString());
+        ps.setString(2, resource);
 
-        try {
-            ps.setString(1, type.toString());
-            ps.setString(2, resource);
-            int rowsAffected = ps.executeUpdate();
-
-            if (rowsAffected == 1) {
-                rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    card = new Card(rs.getInt(1), type, resource);
-                }
+        if (ps.executeUpdate() == 1) {
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                card = new Card(rs.getInt(COLUMN_ID), type, resource);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            controller.closeResultSet(rs);
-            controller.closePreparedStatement(ps);
+            rs.close();
         }
+
+        ps.close();
 
         return card;
     }
 
     @Override
-    public void deleteCardById(int id) {
+    public void deleteCardById(int id) throws SQLException {
         PreparedStatement ps = controller.getPreparedStatement(DELETE);
-
-        try {
-            ps.setInt(1, id);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            controller.closePreparedStatement(ps);
-        }
+        ps.setInt(1, id);
+        ps.executeUpdate();
+        ps.close();
     }
 
     @Override
-    public boolean updateCardResource(Card card, String resource) {
+    public boolean updateCardResource(Card card, String resource) throws SQLException {
         PreparedStatement ps = controller.getPreparedStatement(UPDATE);
+        ps.setString(1, resource);
+        ps.setInt(2, card.getCardId());
+        int affectedRows = ps.executeUpdate();
+        ps.close();
 
-        try {
-            ps.setString(1, resource);
-            ps.setInt(2, card.getCardId());
-
-            if (ps.executeUpdate() == 1) {
-                card.setResource(resource);
-                return true;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            controller.closePreparedStatement(ps);
+        if (affectedRows == 1) {
+            card.setResource(resource);
+            return true;
         }
 
         return false;
     }
 
     @Override
-    public List<Card> getAllCards() {
+    public List<Card> getAllCards() throws SQLException {
         List<Card> cards = new ArrayList<>();
         PreparedStatement ps = controller.getPreparedStatement(SELECT);
-        ResultSet rs = null;
+        ResultSet rs = ps.executeQuery();
 
-        try {
-            rs = ps.executeQuery();
-
-            while (rs.next()) {
-                cards.add(new Card(
-                        rs.getInt(1), CardType.valueOf(rs.getString(2).toUpperCase()),
-                        rs.getString(3)
-                ));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            controller.closeResultSet(rs);
-            controller.closePreparedStatement(ps);
+        while (rs.next()) {
+            cards.add(new Card(
+                rs.getInt(COLUMN_ID), CardType.valueOf(rs.getString(COLUMN_TYPE).toUpperCase()),
+                rs.getString(COLUMN_TYPE)
+            ));
         }
+
+        rs.close();
+        ps.close();
 
         return cards;
     }
 
     @Override
-    public List<Card> getAllCardsByType(CardType type) {
+    public List<Card> getAllCardsByType(CardType type) throws SQLException {
         List<Card> cards = new ArrayList<>();
+
         PreparedStatement ps = controller.getPreparedStatement(SELECT + " WHERE type = CAST(? AS card_type)");
-        ResultSet rs = null;
+        ps.setString(1, type.toString());
 
-        try {
-            ps.setString(1, type.toString());
-            rs = ps.executeQuery();
+        ResultSet rs = ps.executeQuery();
 
-            while (rs.next()) {
-                cards.add(new Card(
-                        rs.getInt(1), CardType.valueOf(rs.getString(2).toUpperCase()),
-                        rs.getString(3)
-                ));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            controller.closeResultSet(rs);
-            controller.closePreparedStatement(ps);
+        while (rs.next()) {
+            cards.add(new Card(
+                rs.getInt(COLUMN_ID), CardType.valueOf(rs.getString(COLUMN_TYPE).toUpperCase()),
+                rs.getString(COLUMN_RESOURCE)
+            ));
         }
+
+        rs.close();
+        ps.close();
 
         return cards;
     }
