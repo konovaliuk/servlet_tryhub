@@ -56,6 +56,14 @@ public class PSQLController {
         }
     }
 
+    public void closeConnection() {
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void startTransaction() {
         try {
             connection.setAutoCommit(false);
