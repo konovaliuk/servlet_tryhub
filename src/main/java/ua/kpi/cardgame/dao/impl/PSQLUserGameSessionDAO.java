@@ -18,7 +18,7 @@ public class PSQLUserGameSessionDAO implements UserGameSessionDAO {
     private static final String DELETE_SESSION = "DELETE FROM cardGame.users_game_session WHERE session_id = ?";
 
     public PSQLUserGameSessionDAO() {
-        controller = new PSQLController();
+        controller = PSQLController.getInstance();
     }
 
     @Override
@@ -29,7 +29,7 @@ public class PSQLUserGameSessionDAO implements UserGameSessionDAO {
         ps.setInt(2, sessionId);
         ps.executeUpdate();
 
-        controller.closePreparedStatement(ps);
+        ps.close();
     }
 
     @Override
@@ -39,7 +39,7 @@ public class PSQLUserGameSessionDAO implements UserGameSessionDAO {
         ps.setInt(1, userId);
         ps.executeUpdate();
 
-        controller.closePreparedStatement(ps);
+        ps.close();
     }
 
     @Override
@@ -53,7 +53,7 @@ public class PSQLUserGameSessionDAO implements UserGameSessionDAO {
             userGameSession.setUserChoice(choice);
         }
 
-        controller.closePreparedStatement(ps);
+        ps.close();
 
         return choice;
     }
@@ -65,7 +65,7 @@ public class PSQLUserGameSessionDAO implements UserGameSessionDAO {
         ps.setInt(1, sessionId);
         ps.executeUpdate();
 
-        controller.closePreparedStatement(ps);
+        ps.close();
     }
 
     @Override
@@ -81,8 +81,8 @@ public class PSQLUserGameSessionDAO implements UserGameSessionDAO {
             userGameSessions.add(new UserGameSession(rs.getInt(1), rs.getInt(2), rs.getInt(3)));
         }
 
-        controller.closeResultSet(rs);
-        controller.closePreparedStatement(ps);
+        rs.close();
+        ps.close();
 
         return userGameSessions;
     }
