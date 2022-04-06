@@ -11,55 +11,47 @@ import java.util.List;
 
 public class PSQLUserOnlineDAO implements IUserOnlineDAO {
     private final PSQLController controller;
+
+    private static final String COLUMN_ID = "user_id";
+    private static final String COLUMN_TIMESTAMP = "timestamp";
+
     private static final String SELECT = "SELECT * FROM cardGame.users_online";
     private static final String INSERT = "INSERT INTO cardGame.users_online (user_id) VALUES (?)";
     private static final String DELETE = "DELETE FROM cardGame.users_online WHERE user_id = ?";
 
     public PSQLUserOnlineDAO() {
-        controller = new PSQLController();
+        controller = PSQLController.getInstance();
     }
 
-    private void updateUserOnlineStatus(String action, int userId) {
+    private void updateUserOnlineStatus(String action, int userId) throws SQLException {
         PreparedStatement ps = controller.getPreparedStatement(action);
-
-        try {
-            ps.setInt(1, userId);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            controller.closePreparedStatement(ps);
-        }
+        ps.setInt(1, userId);
+        ps.executeUpdate();
+        ps.close();
     }
 
     @Override
-    public void setUserOnline(int userId) {
+    public void setUserOnline(int userId) throws SQLException {
         updateUserOnlineStatus(INSERT, userId);
     }
 
     @Override
-    public void setUserOffline(int userId) {
+    public void setUserOffline(int userId) throws SQLException {
         updateUserOnlineStatus(DELETE, userId);
     }
 
     @Override
-    public List<UserOnlineStatus> getAllOnlineUsers() {
+    public List<UserOnlineStatus> getAllOnlineUsers() throws SQLException {
         List<UserOnlineStatus> userOnlineStatuses = new ArrayList<>();
         PreparedStatement ps = controller.getPreparedStatement(SELECT);
-        ResultSet rs = null;
+        ResultSet rs = ps.executeQuery();
 
-        try {
-            rs = ps.executeQuery();
-
-            while (rs.next()) {
-                userOnlineStatuses.add(new UserOnlineStatus(rs.getInt(1), rs.getTimestamp(2)));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            controller.closeResultSet(rs);
-            controller.closePreparedStatement(ps);
+        while (rs.next()) {
+            userOnlineStatuses.add(new UserOnlineStatus(rs.getInt(COLUMN_ID), rs.getTimestamp(COLUMN_TIMESTAMP)));
         }
+
+        rs.close();
+        ps.close();
 
         return userOnlineStatuses;
     }
