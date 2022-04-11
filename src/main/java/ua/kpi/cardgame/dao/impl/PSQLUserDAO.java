@@ -12,6 +12,12 @@ import java.util.List;
 
 public class PSQLUserDAO implements IUserDAO {
     private final PSQLController controller;
+
+    private static final String COLUMN_ID = "user_id";
+    private static final String COLUMN_LOGIN = "login";
+    private static final String COLUMN_PASSWORD = "password";
+    private static final String COLUMN_RATE = "rate";
+
     private static final String SELECT = "SELECT * FROM cardGame.users";
     private static final String INSERT = "INSERT INTO cardGame.users (login, password) VALUES (?, ?)";
     private static final String UPDATE_RATE = "UPDATE cardGame.users SET rate = ? WHERE user_id = ?";
@@ -19,94 +25,77 @@ public class PSQLUserDAO implements IUserDAO {
     private static final String DELETE = "DELETE FROM cardGame.users WHERE user_id = ?";
 
     public PSQLUserDAO() {
-        controller = new PSQLController();
+        controller = PSQLController.getInstance();
     }
 
     @Override
-    public User getUserById(int id) {
+    public User getUserById(int id) throws SQLException {
         User user = null;
+
         PreparedStatement ps = controller.getPreparedStatement(SELECT + " WHERE user_id = ?");
+        ps.setInt(1, id);
 
-        try {
-            ps.setInt(1, id);
-            ResultSet users = ps.executeQuery();
+        ResultSet rs = ps.executeQuery();
 
-            if (users.next()) {
-                user = new User(
-                        users.getInt(1), users.getString(2),
-                        users.getString(3), users.getInt(4)
-                );
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            controller.closePreparedStatement(ps);
+        if (rs.next()) {
+            user = new User(
+                rs.getInt(COLUMN_ID), rs.getString(COLUMN_LOGIN),
+                rs.getString(COLUMN_PASSWORD), rs.getInt(COLUMN_RATE)
+            );
         }
+
+        rs.close();
+        ps.close();
 
         return user;
     }
 
     @Override
-    public User createUser(String login, String password) {
+    public User createUser(String login, String password) throws SQLException {
         User user = null;
+
         PreparedStatement ps = controller.getPreparedStatement(INSERT, Statement.RETURN_GENERATED_KEYS);
+        ps.setString(1, login);
+        ps.setString(2, password);
 
-        try {
-            ps.setString(1, login);
-            ps.setString(2, password);
-            int rowsAffected = ps.executeUpdate();
-
-            if (rowsAffected == 1) {
-                ResultSet rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    user = new User(rs.getInt(1), login, password, 0);
-                }
+        if (ps.executeUpdate() == 1) {
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                user = new User(rs.getInt(COLUMN_ID), login, password, 0);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            controller.closePreparedStatement(ps);
+            rs.close();
         }
+
+        ps.close();
 
         return user;
     }
 
     @Override
-    public void deleteUserById(int id) {
+    public void deleteUserById(int id) throws SQLException {
         PreparedStatement ps = controller.getPreparedStatement(DELETE);
-
-        try {
-            ps.setInt(1, id);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            controller.closePreparedStatement(ps);
-        }
+        ps.setInt(1, id);
+        ps.executeUpdate();
+        ps.close();
     }
 
-    private boolean updateUserFiled(String sql, User user, Object field) {
+    private boolean updateUserField(String sql, User user, Object field) throws SQLException {
         PreparedStatement ps = controller.getPreparedStatement(sql);
+        ps.setObject(1, field);
+        ps.setInt(2, user.getUserId());
+        int rowsAffected = ps.executeUpdate();
+        ps.close();
 
-        try {
-            ps.setObject(1, field);
-            ps.setInt(2, user.getUserId());
-
-            if (ps.executeUpdate() == 1) {
-                return true;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            controller.closePreparedStatement(ps);
+        if (rowsAffected == 1) {
+            return true;
         }
 
         return false;
     }
 
     @Override
-    public boolean updateUserRate(User user, int rate) {
-        if (updateUserFiled(UPDATE_RATE, user, rate)) {
+    public boolean updateUserRate(User user, int rate) throws SQLException {
+        if (updateUserField(UPDATE_RATE, user, rate)) {
             user.setRate(rate);
             return true;
         }
@@ -115,8 +104,8 @@ public class PSQLUserDAO implements IUserDAO {
     }
 
     @Override
-    public boolean updateUserPassword(User user, String password) {
-        if (updateUserFiled(UPDATE_PASSWORD, user, password)) {
+    public boolean updateUserPassword(User user, String password) throws SQLException {
+        if (updateUserField(UPDATE_PASSWORD, user, password)) {
             user.setPassword(password);
             return true;
         }
@@ -125,51 +114,39 @@ public class PSQLUserDAO implements IUserDAO {
     }
 
     @Override
-    public List<User> getAllUsers() {
+    public List<User> getAllUsers() throws SQLException {
         List<User> users = new ArrayList<>();
         PreparedStatement ps = controller.getPreparedStatement(SELECT);
-        ResultSet rs = null;
+        ResultSet rs = ps.executeQuery();
 
-        try {
-            rs = ps.executeQuery();
-
-            while (rs.next()) {
-                users.add(new User(
-                        rs.getInt(1), rs.getString(2),
-                        rs.getString(3), rs.getInt(4)
-                ));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            controller.closeResultSet(rs);
-            controller.closePreparedStatement(ps);
+        while (rs.next()) {
+            users.add(new User(
+                rs.getInt(COLUMN_ID), rs.getString(COLUMN_LOGIN),
+                rs.getString(COLUMN_PASSWORD), rs.getInt(COLUMN_RATE)
+            ));
         }
+
+        rs.close();
+        ps.close();
 
         return users;
     }
 
     @Override
-    public List<User> getUsersWithRateBetween(int from, int to) {
+    public List<User> getUsersWithRateBetween(int from, int to) throws SQLException {
         List<User> users = new ArrayList<>();
-        PreparedStatement ps = controller.getPreparedStatement(SELECT+" WHERE rate BETWEEN "+from+" and "+to);
-        ResultSet rs = null;
+        PreparedStatement ps = controller.getPreparedStatement(SELECT + " WHERE rate BETWEEN " + from + " and " + to);
+        ResultSet rs = ps.executeQuery();
 
-        try {
-            rs = ps.executeQuery();
-
-            while (rs.next()) {
-                users.add(new User(
-                        rs.getInt(1), rs.getString(2),
-                        rs.getString(3), rs.getInt(4)
-                ));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            controller.closeResultSet(rs);
-            controller.closePreparedStatement(ps);
+        while (rs.next()) {
+            users.add(new User(
+                rs.getInt(COLUMN_ID), rs.getString(COLUMN_LOGIN),
+                rs.getString(COLUMN_PASSWORD), rs.getInt(COLUMN_PASSWORD)
+            ));
         }
+
+        rs.close();
+        ps.close();
 
         return users;
     }
