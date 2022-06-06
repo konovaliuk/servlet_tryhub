@@ -17,6 +17,7 @@ public class PostgreSQLConnector {
         String username = resource.getString("username");
         String password = resource.getString("password");
         dataSource = new BasicDataSource();
+        dataSource.setDriverClassName("org.postgresql.Driver");
         dataSource.setUrl(url);
         dataSource.setUsername(username);
         dataSource.setPassword(password);

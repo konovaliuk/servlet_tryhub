@@ -1,6 +1,5 @@
 package ua.kpi.cardgame;
 
-import ua.kpi.cardgame.dao.impl.PSQLController;
 import ua.kpi.cardgame.dao.impl.PSQLUserDAO;
 import ua.kpi.cardgame.dao.impl.PSQLUserOnlineDAO;
 import ua.kpi.cardgame.entities.User;
@@ -17,7 +16,7 @@ public class Runner {
 
         User newUser = psqlUserDAO.createUser("new_login", "new_password");
         psqlUserOnlineDAO.setUserOnline(newUser.getUserId());
-        PSQLController.getInstance().rollbackTransaction();
+        psqlUserOnlineDAO.rollbackTransaction();
         System.out.println(psqlUserDAO.getAllUsers());
         System.out.println(psqlUserOnlineDAO.getAllOnlineUsers());
         System.out.println("==================================");
@@ -30,6 +29,6 @@ public class Runner {
         psqlUserDAO.deleteUserById(newUser.getUserId());
         System.out.println(psqlUserDAO.getAllUsers());
         System.out.println("==================================");
-        PSQLController.getInstance().commitTransaction();
+        psqlUserDAO.commitTransaction();
     }
 }

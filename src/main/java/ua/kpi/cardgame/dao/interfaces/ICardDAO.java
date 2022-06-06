@@ -6,7 +6,7 @@ import ua.kpi.cardgame.entities.CardType;
 import java.sql.SQLException;
 import java.util.List;
 
-public interface ICardDAO {
+public interface ICardDAO extends DAO {
     Card getCardById(int id) throws SQLException;
     Card createCard(CardType type, String resource) throws SQLException;
     void deleteCardById(int id) throws SQLException;
