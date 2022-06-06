@@ -5,7 +5,7 @@ import ua.kpi.cardgame.entities.UserCard;
 import java.sql.SQLException;
 import java.util.List;
 
-public interface IUserCardsDAO {
+public interface IUserCardsDAO extends DAO {
     boolean addUserCards(List<UserCard> userCards) throws SQLException;
     boolean addUserCard(UserCard userCard) throws SQLException;
     List<UserCard> getUserCards(int sessionId, int userId) throws SQLException;

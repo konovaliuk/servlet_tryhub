@@ -134,4 +134,14 @@ public class PSQLCardDAO implements ICardDAO {
 
         return cards;
     }
+
+    @Override
+    public void rollbackTransaction() {
+        controller.rollbackTransaction();
+    }
+
+    @Override
+    public void commitTransaction() throws SQLException {
+        controller.commitTransaction();
+    }
 }

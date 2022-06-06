@@ -37,9 +37,13 @@ public class PSQLController {
         connection.setAutoCommit(false);
     }
 
-    public void rollbackTransaction() throws SQLException {
-        connection.rollback();
-        connection.close();
+    public void rollbackTransaction() {
+        try {
+            connection.rollback();
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void commitTransaction() throws SQLException {

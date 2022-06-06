@@ -33,4 +33,14 @@ public class PSQLEventDAO implements EventDAO {
 
         return event;
     }
+
+    @Override
+    public void rollbackTransaction() {
+        controller.rollbackTransaction();
+    }
+
+    @Override
+    public void commitTransaction() throws SQLException {
+        controller.commitTransaction();
+    }
 }

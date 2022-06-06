@@ -163,4 +163,14 @@ public class PSQLGameSessionDAO implements GameSessionDAO {
 
         return gameSessions;
     }
+
+    @Override
+    public void rollbackTransaction() {
+        controller.rollbackTransaction();
+    }
+
+    @Override
+    public void commitTransaction() throws SQLException {
+        controller.commitTransaction();
+    }
 }
