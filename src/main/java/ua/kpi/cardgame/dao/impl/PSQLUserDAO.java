@@ -51,6 +51,28 @@ public class PSQLUserDAO implements IUserDAO {
     }
 
     @Override
+    public User getUserByLogin(String login) throws SQLException {
+        User user = null;
+
+        PreparedStatement ps = controller.getPreparedStatement(SELECT + " WHERE login = ?");
+        ps.setString(1, login);
+
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            user = new User(
+                rs.getInt(COLUMN_ID), rs.getString(COLUMN_LOGIN),
+                rs.getString(COLUMN_PASSWORD), rs.getInt(COLUMN_RATE)
+            );
+        }
+
+        rs.close();
+        ps.close();
+
+        return user;
+    }
+
+    @Override
     public User createUser(String login, String password) throws SQLException {
         User user = null;
 
@@ -149,5 +171,15 @@ public class PSQLUserDAO implements IUserDAO {
         ps.close();
 
         return users;
+    }
+
+    @Override
+    public void rollbackTransaction() {
+        controller.rollbackTransaction();
+    }
+
+    @Override
+    public void commitTransaction() throws SQLException {
+        controller.commitTransaction();
     }
 }

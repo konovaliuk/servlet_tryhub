@@ -5,8 +5,9 @@ import ua.kpi.cardgame.entities.User;
 import java.sql.SQLException;
 import java.util.List;
 
-public interface IUserDAO {
+public interface IUserDAO extends DAO {
     User getUserById(int id) throws SQLException;
+    User getUserByLogin(String login) throws SQLException;
     User createUser(String login, String password) throws SQLException;
     void deleteUserById(int id) throws SQLException;
     boolean updateUserRate(User user, int rate) throws SQLException;
