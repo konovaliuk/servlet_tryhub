@@ -11,7 +11,7 @@ import ua.kpi.cardgame.command.UserOnlineCommand;
 
 import java.io.IOException;
 
-@WebServlet(name="Controller", urlPatterns = {"/register", "/login", "/logout", "/main"})
+@WebServlet(name="Controller", urlPatterns = {"/register", "/login", "/logout", "/main", "/api/*"})
 public class Controller extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
@@ -29,7 +29,6 @@ public class Controller extends HttpServlet {
         ICommand command = ControllerHelper.getInstance().getCommand(req);
         String page = command.execute(req, resp);
         if (page.startsWith("redirect:")) {
-            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(page.substring(9));
             resp.sendRedirect(page.substring(9));
         } else {
             RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(page);

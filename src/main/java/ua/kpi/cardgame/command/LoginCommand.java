@@ -3,7 +3,7 @@ package ua.kpi.cardgame.command;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ua.kpi.cardgame.entities.User;
-import ua.kpi.cardgame.services.UserService;
+import ua.kpi.cardgame.services.ServiceFactory;
 
 public class LoginCommand implements ICommand {
     private final static String AUTH_PAGE = "/auth.jsp";
@@ -26,7 +26,7 @@ public class LoginCommand implements ICommand {
                 return AUTH_PAGE;
             }
 
-            User user = new UserService().login(login, password);
+            User user = ServiceFactory.getUserService().login(login, password);
 
             if (user == null) {
                 req.setAttribute("error", "Invalid username or password");
