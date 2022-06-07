@@ -1,7 +1,6 @@
 package ua.kpi.cardgame.services;
 
-import ua.kpi.cardgame.dao.impl.PSQLUserDAO;
-import ua.kpi.cardgame.dao.impl.PSQLUserOnlineDAO;
+import ua.kpi.cardgame.dao.DAOFactory;
 import ua.kpi.cardgame.dao.interfaces.IUserDAO;
 import ua.kpi.cardgame.dao.interfaces.IUserOnlineDAO;
 import ua.kpi.cardgame.entities.User;
@@ -13,8 +12,8 @@ import java.util.List;
 
 public class UserService {
     public User register(String login, String password) {
-        IUserDAO userDAO = new PSQLUserDAO();
-        IUserOnlineDAO userOnlineDAO = new PSQLUserOnlineDAO();
+        IUserDAO userDAO = DAOFactory.getUserDAO();
+        IUserOnlineDAO userOnlineDAO = DAOFactory.getUserOnlineDAO();
         User user = null;
 
         try {
@@ -34,8 +33,8 @@ public class UserService {
     }
 
     public User login(String login, String password) {
-        IUserDAO userDAO = new PSQLUserDAO();
-        IUserOnlineDAO userOnlineDAO = new PSQLUserOnlineDAO();
+        IUserDAO userDAO = DAOFactory.getUserDAO();
+        IUserOnlineDAO userOnlineDAO = DAOFactory.getUserOnlineDAO();
         User user = null;
 
         try {
@@ -55,7 +54,7 @@ public class UserService {
     }
 
     public void logout(User user) {
-        IUserOnlineDAO userOnlineDAO = new PSQLUserOnlineDAO();
+        IUserOnlineDAO userOnlineDAO = DAOFactory.getUserOnlineDAO();
 
         try {
             userOnlineDAO.setUserOffline(user.getUserId());
@@ -67,7 +66,7 @@ public class UserService {
     }
 
     public void setUserOnline(User user) {
-        IUserOnlineDAO userOnlineDAO = new PSQLUserOnlineDAO();
+        IUserOnlineDAO userOnlineDAO = DAOFactory.getUserOnlineDAO();
 
         try {
             userOnlineDAO.setUserOnline(user.getUserId());
@@ -78,8 +77,8 @@ public class UserService {
     }
 
     public List<User> getAllOnline() {
-        IUserDAO userDAO = new PSQLUserDAO();
-        IUserOnlineDAO userOnlineDAO = new PSQLUserOnlineDAO();
+        IUserDAO userDAO = DAOFactory.getUserDAO();
+        IUserOnlineDAO userOnlineDAO = DAOFactory.getUserOnlineDAO();
         List<User> users = new ArrayList<>();
 
         try {
