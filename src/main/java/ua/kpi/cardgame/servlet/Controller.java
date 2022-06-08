@@ -11,7 +11,7 @@ import ua.kpi.cardgame.command.UserOnlineCommand;
 
 import java.io.IOException;
 
-@WebServlet(name="Controller", urlPatterns = {"/register", "/login", "/logout", "/main", "/api/*"})
+@WebServlet(name="Controller", urlPatterns = {"/register", "/login", "/logout", "/main", "/lobby", "/api/*"})
 public class Controller extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {

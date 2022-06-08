@@ -3,11 +3,9 @@ package ua.kpi.cardgame.dao.impl;
 import ua.kpi.cardgame.dao.interfaces.GameSessionDAO;
 import ua.kpi.cardgame.entities.GameSession;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class PSQLGameSessionDAO implements GameSessionDAO {
@@ -17,7 +15,7 @@ public class PSQLGameSessionDAO implements GameSessionDAO {
     private static final String UPDATE_STAGE= "UPDATE cardGame.game_sessions SET stage = ? WHERE session_id = ?";
     private static final String UPDATE_LEADER = "UPDATE cardGame.game_sessions SET leader_id = ? WHERE session_id = ?";
     private static final String UPDATE_CONDITION = "UPDATE cardGame.game_sessions SET condition_id = ? WHERE session_id = ?";
-    private static final String UPDATE_EVENT = "UPDATE cardGame.game_sessions SET event_id = ? WHERE session_id = ?";
+    private static final String UPDATE_EVENT = "UPDATE cardGame.game_sessions SET event_id = ?, event_start_time = CURRENT_TIMESTAMP WHERE session_id = ?";
     private static final String DELETE = "DELETE FROM cardGame.game_sessions WHERE session_id = ?";
 
     public PSQLGameSessionDAO() {
@@ -137,6 +135,7 @@ public class PSQLGameSessionDAO implements GameSessionDAO {
 
         if (ps.executeUpdate() == 1) {
             session.setEventId(eventId);
+            session.setEventStartTime(new Timestamp(new Date().getTime()));
         }
 
         ps.close();

@@ -14,6 +14,11 @@ public class ControllerHelper {
         commands.put("/login", new LoginCommand());
         commands.put("/logout", new LogoutCommand());
         commands.put("/main", new MainPageCommand());
+        commands.put("/lobby", new LobbyPageCommand());
+        commands.put("/api/searchGame", new SearchGameCommand());
+        commands.put("/api/cancelSearch", new SearchGameCommand());
+        commands.put("/api/getSessionInfo", new GameSessionInfoCommand());
+        commands.put("/api/makeChoice", new MakeChoiceCommand());
     }
 
     public static ControllerHelper getInstance() {

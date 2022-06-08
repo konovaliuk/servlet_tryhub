@@ -58,4 +58,12 @@ public class Card {
                 ", resource='" + resource + '\'' +
                 '}';
     }
+
+    public String toJSON() {
+        return "{" +
+                "\"card_id\": " + cardId +
+                ", \"type\": \"" + type +
+                "\", \"resource\": \"" + resource +
+                "\"}";
+    }
 }

@@ -21,6 +21,7 @@ public class PSQLUserSearchGameDAO implements UserSearchGameDAO {
 
     @Override
     public void startUserSearchGame(int userId) throws SQLException {
+        stopUserSearchGame(userId);
         PreparedStatement ps = controller.getPreparedStatement(INSERT);
 
         ps.setInt(1, userId);
@@ -49,9 +50,10 @@ public class PSQLUserSearchGameDAO implements UserSearchGameDAO {
 
         while (rs.next()) {
             usersSearchGame.add(new UserSearchGame(rs.getInt(1), rs.getTimestamp(2)));
-            rs.close();
-            ps.close();
         }
+
+        rs.close();
+        ps.close();
 
         return usersSearchGame;
     }
