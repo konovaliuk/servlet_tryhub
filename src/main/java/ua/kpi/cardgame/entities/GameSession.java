@@ -70,4 +70,15 @@ public class GameSession {
                 ", eventId=" + eventId +
                 '}';
     }
+
+    public String toJSON() {
+        return "{" +
+                "\"session_id\": " + sessionId +
+                ", \"stage\": " + stage +
+                ", \"leader_id\": " + leaderId +
+                ", \"condition_id\": " + conditionId +
+                ", \"event_start_time\": \"" + eventStartTime +
+                "\", \"event_id\": " + eventId +
+                '}';
+    }
 }

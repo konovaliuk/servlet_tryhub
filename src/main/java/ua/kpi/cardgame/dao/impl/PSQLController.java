@@ -34,20 +34,20 @@ public class PSQLController {
         if (connection == null || connection.isClosed()) {
             connection = ConnectionFactory.getPostgreSQLConnection();
         }
-        connection.setAutoCommit(false);
+//        connection.setAutoCommit(false);
     }
 
     public void rollbackTransaction() {
-        try {
-            connection.rollback();
-            connection.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            connection.rollback();
+//            connection.close();
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public void commitTransaction() throws SQLException {
-        connection.commit();
-        connection.close();
+//        connection.commit();
+//        connection.close();
     }
 }

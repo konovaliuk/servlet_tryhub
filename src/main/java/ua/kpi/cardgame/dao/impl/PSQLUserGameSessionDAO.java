@@ -47,7 +47,7 @@ public class PSQLUserGameSessionDAO implements UserGameSessionDAO {
         PreparedStatement ps = controller.getPreparedStatement(UPDATE_CHOICE);
 
         ps.setInt(1, choice);
-        ps.setInt(2, userGameSession.getSessionId());
+        ps.setInt(2, userGameSession.getUserId());
 
         if (ps.executeUpdate() == 1) {
             userGameSession.setUserChoice(choice);
@@ -72,6 +72,7 @@ public class PSQLUserGameSessionDAO implements UserGameSessionDAO {
     public List<UserGameSession> getUsersBySessionId(int sessionId) throws SQLException {
         List<UserGameSession> userGameSessions = new ArrayList<>();
         PreparedStatement ps = controller.getPreparedStatement(SELECT + " WHERE session_id = ?");
+        ps.setInt(1, sessionId);
 
         ResultSet rs;
 
