@@ -1,6 +1,9 @@
 package ua.kpi.cardgame.dao;
 
 import ua.kpi.cardgame.dao.impl.*;
+import ua.kpi.cardgame.dao.impl.jpa.JPAUserDAO;
+import ua.kpi.cardgame.dao.impl.jpa.JPAUserOnlineDAO;
+import ua.kpi.cardgame.dao.impl.jpa.JPAUserSearchGameDAO;
 import ua.kpi.cardgame.dao.interfaces.*;
 
 public class DAOFactory {
@@ -8,10 +11,10 @@ public class DAOFactory {
     private static final GameSessionDAO gameSessionDAO = new PSQLGameSessionDAO();
     private static final ICardDAO cardDAO = new PSQLCardDAO();
     private static final IUserCardsDAO userCardsDAO = new PSQLUserCardsDAO();
-    private static final IUserDAO userDAO = new PSQLUserDAO();
-    private static final IUserOnlineDAO userOnlineDAO = new PSQLUserOnlineDAO();
+    private static final IUserDAO userDAO = new JPAUserDAO();
+    private static final IUserOnlineDAO userOnlineDAO = new JPAUserOnlineDAO();
     private static final UserGameSessionDAO userGameSessionDAO = new PSQLUserGameSessionDAO();
-    private static final UserSearchGameDAO userSearchGameDAO = new PSQLUserSearchGameDAO();
+    private static final UserSearchGameDAO userSearchGameDAO = new JPAUserSearchGameDAO();
 
     public static EventDAO getEventDAO() {
         return eventDAO;
