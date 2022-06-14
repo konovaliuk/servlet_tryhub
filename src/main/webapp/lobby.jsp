@@ -115,7 +115,7 @@
                 _response = response
             }
 
-            interval = setInterval(checkGameStatus, 2000);
+            interval = setInterval(checkGameStatus, 5000);
             checkGameStatus();
         </script>
     </body>

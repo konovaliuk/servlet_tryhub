@@ -27,10 +27,10 @@ public class GameService {
             } else if ("cancel".equals(action)) {
                 userSearchGameDAO.stopUserSearchGame(user.getUserId());
             }
-            userSearchGameDAO.commitTransaction();
+//            userSearchGameDAO.commitTransaction();
             return true;
         } catch (SQLException e) {
-            userSearchGameDAO.rollbackTransaction();
+//            userSearchGameDAO.rollbackTransaction();
             return false;
         }
     }
