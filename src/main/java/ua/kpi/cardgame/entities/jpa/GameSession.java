@@ -1,10 +1,15 @@
 package ua.kpi.cardgame.entities.jpa;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
+@NamedQueries({
+    @NamedQuery(name = "GameSession.findAll", query = "SELECT g FROM GameSession g"),
+})
 public class GameSession {
     @Id
     @GeneratedValue
@@ -14,6 +19,8 @@ public class GameSession {
     private User leader;
     @OneToOne
     private Card condition;
+
+    @CreationTimestamp
     private Timestamp eventStartTime;
     @OneToOne
     private Event event;

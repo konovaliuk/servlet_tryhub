@@ -1,16 +1,30 @@
 package ua.kpi.cardgame;
 
-import ua.kpi.cardgame.dao.impl.jpa.JPAUserDAO;
+import ua.kpi.cardgame.dao.DAOFactory;
+import ua.kpi.cardgame.dao.interfaces.GameSessionDAO;
 import ua.kpi.cardgame.dao.interfaces.IUserDAO;
+import ua.kpi.cardgame.dao.interfaces.UserGameSessionDAO;
+import ua.kpi.cardgame.entities.GameSession;
+import ua.kpi.cardgame.entities.UserGameSession;
 
 import java.sql.SQLException;
 
 public class RunnerJPA {
     public static void main(String[] args) throws SQLException {
-        IUserDAO userDAO = new JPAUserDAO();
+        IUserDAO userDAO = DAOFactory.getUserDAO();
+        GameSessionDAO gameSessionDAO = DAOFactory.getGameSessionDAO();
+        UserGameSessionDAO userGameSessionDAO = DAOFactory.getUserGameSessionDAO();
 
-        userDAO.createUser("test", "test");
-        System.out.println(userDAO.getUsersWithRateBetween(2, 4));
-        userDAO.deleteUserById(15);
+        GameSession session = gameSessionDAO.createSession(1, 24, 1, 1);
+        userGameSessionDAO.setUserGameSession(24, session.getSessionId());
+        userGameSessionDAO.commitTransaction();
+
+        userGameSessionDAO.updateUserSessionChoice(new UserGameSession(session.getSessionId(), 24, 0), 10);
+        userGameSessionDAO.commitTransaction();
+        System.out.println(userGameSessionDAO.getUsersBySessionId(session.getSessionId()));
+
+        userGameSessionDAO.deleteAllBySessionId(session.getSessionId());
+        gameSessionDAO.deleteSessionById(session.getSessionId());
+        gameSessionDAO.commitTransaction();
     }
 }

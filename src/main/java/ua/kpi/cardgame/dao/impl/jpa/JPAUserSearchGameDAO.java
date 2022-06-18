@@ -5,7 +5,7 @@ import ua.kpi.cardgame.entities.UserSearchGame;
 import ua.kpi.cardgame.entities.jpa.User;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
+import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -13,16 +13,33 @@ import java.util.Date;
 import java.util.List;
 
 public class JPAUserSearchGameDAO implements UserSearchGameDAO {
-    EntityManager entityManager = Persistence.createEntityManagerFactory("jpa").createEntityManager();
+    private final EntityManager entityManager;
+
+    public JPAUserSearchGameDAO(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
+    public void startTransaction() {
+        EntityTransaction transaction = entityManager.getTransaction();
+        if (!transaction.isActive()) {
+            transaction.begin();
+        }
+    }
 
     @Override
     public void rollbackTransaction() {
-        entityManager.getTransaction().rollback();
+        EntityTransaction transaction = entityManager.getTransaction();
+        if (transaction.isActive()) {
+            transaction.rollback();
+        }
     }
 
     @Override
     public void commitTransaction() throws SQLException {
-        entityManager.getTransaction().commit();
+        EntityTransaction transaction = entityManager.getTransaction();
+        if (transaction.isActive()) {
+            transaction.commit();
+        }
     }
 
     @Override
@@ -31,7 +48,7 @@ public class JPAUserSearchGameDAO implements UserSearchGameDAO {
         ua.kpi.cardgame.entities.jpa.UserSearchGame userSearchGame = new ua.kpi.cardgame.entities.jpa.UserSearchGame(
             user, new Timestamp(new Date().getTime())
         );
-        entityManager.getTransaction().begin();
+        startTransaction();
         entityManager.persist(userSearchGame);
         commitTransaction();
     }
@@ -39,7 +56,7 @@ public class JPAUserSearchGameDAO implements UserSearchGameDAO {
     @Override
     public void stopUserSearchGame(int userId) throws SQLException {
         ua.kpi.cardgame.entities.jpa.UserSearchGame userSearchGame = entityManager.find(ua.kpi.cardgame.entities.jpa.UserSearchGame.class, userId);
-        entityManager.getTransaction().begin();
+        startTransaction();
         entityManager.remove(userSearchGame);
         commitTransaction();
     }
@@ -47,7 +64,7 @@ public class JPAUserSearchGameDAO implements UserSearchGameDAO {
     @Override
     public List<UserSearchGame> getAllUserSearchGame() throws SQLException {
         TypedQuery<ua.kpi.cardgame.entities.jpa.UserSearchGame> query = entityManager.createNamedQuery(
-        "UserOnlineStatus.findAll", ua.kpi.cardgame.entities.jpa.UserSearchGame.class
+        "UserSearchGame.findAll", ua.kpi.cardgame.entities.jpa.UserSearchGame.class
         );
         List<ua.kpi.cardgame.entities.jpa.UserSearchGame> results = query.getResultList();
         return results.stream().map((userSearchGame) -> {

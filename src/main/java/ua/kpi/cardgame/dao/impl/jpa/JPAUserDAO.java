@@ -8,18 +8,33 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class JPAUserDAO implements IUserDAO {
-    EntityManager entityManager = Persistence.createEntityManagerFactory("jpa").createEntityManager();
+    private final EntityManager entityManager;
+
+    public JPAUserDAO(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
+    public void startTransaction() {
+        EntityTransaction transaction = entityManager.getTransaction();
+        if (!transaction.isActive()) {
+            transaction.begin();
+        }
+    }
 
     @Override
     public void rollbackTransaction() {
         EntityTransaction transaction = entityManager.getTransaction();
-        transaction.rollback();
+        if (transaction.isActive()) {
+            transaction.rollback();
+        }
     }
 
     @Override
     public void commitTransaction() throws SQLException {
         EntityTransaction transaction = entityManager.getTransaction();
-        transaction.commit();
+        if (transaction.isActive()) {
+            transaction.commit();
+        }
     }
 
     @Override
@@ -55,7 +70,7 @@ public class JPAUserDAO implements IUserDAO {
         user.setPassword(password);
         user.setRate(0);
         try {
-            entityManager.getTransaction().begin();
+            startTransaction();
             entityManager.persist(user);
             commitTransaction();
             return new User(user.getUserId(), user.getLogin(), user.getPassword(), user.getRate());
@@ -68,7 +83,7 @@ public class JPAUserDAO implements IUserDAO {
     public void deleteUserById(int id) throws SQLException {
         ua.kpi.cardgame.entities.jpa.User entity = entityManager.find(ua.kpi.cardgame.entities.jpa.User.class, id);
         try {
-            entityManager.getTransaction().begin();
+            startTransaction();
             entityManager.remove(entity);
             commitTransaction();
         } catch (Exception e) {}
@@ -79,7 +94,7 @@ public class JPAUserDAO implements IUserDAO {
         ua.kpi.cardgame.entities.jpa.User entity = entityManager.find(ua.kpi.cardgame.entities.jpa.User.class, user.getUserId());
         entity.setRate(rate);
         try {
-            entityManager.getTransaction().begin();
+            startTransaction();
             entityManager.merge(entity);
             commitTransaction();
             return true;
@@ -93,7 +108,7 @@ public class JPAUserDAO implements IUserDAO {
         ua.kpi.cardgame.entities.jpa.User entity = entityManager.find(ua.kpi.cardgame.entities.jpa.User.class, user.getUserId());
         entity.setPassword(password);
         try {
-            entityManager.getTransaction().begin();
+            startTransaction();
             entityManager.merge(entity);
             commitTransaction();
             return true;

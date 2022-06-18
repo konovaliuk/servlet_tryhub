@@ -1,50 +1,43 @@
 package ua.kpi.cardgame.dao;
 
-import ua.kpi.cardgame.dao.impl.*;
-import ua.kpi.cardgame.dao.impl.jpa.JPAUserDAO;
-import ua.kpi.cardgame.dao.impl.jpa.JPAUserOnlineDAO;
-import ua.kpi.cardgame.dao.impl.jpa.JPAUserSearchGameDAO;
+import ua.kpi.cardgame.dao.impl.jpa.*;
 import ua.kpi.cardgame.dao.interfaces.*;
 
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
 public class DAOFactory {
-    private static final EventDAO eventDAO = new PSQLEventDAO();
-    private static final GameSessionDAO gameSessionDAO = new PSQLGameSessionDAO();
-    private static final ICardDAO cardDAO = new PSQLCardDAO();
-    private static final IUserCardsDAO userCardsDAO = new PSQLUserCardsDAO();
-    private static final IUserDAO userDAO = new JPAUserDAO();
-    private static final IUserOnlineDAO userOnlineDAO = new JPAUserOnlineDAO();
-    private static final UserGameSessionDAO userGameSessionDAO = new PSQLUserGameSessionDAO();
-    private static final UserSearchGameDAO userSearchGameDAO = new JPAUserSearchGameDAO();
+    private static final EntityManagerFactory entityManager = Persistence.createEntityManagerFactory("jpa");
 
     public static EventDAO getEventDAO() {
-        return eventDAO;
+        return new JPAEventDAO(entityManager.createEntityManager());
     }
 
     public static GameSessionDAO getGameSessionDAO() {
-        return gameSessionDAO;
+        return new JPAGameSessionDAO(entityManager.createEntityManager());
     }
 
     public static ICardDAO getCardDAO() {
-        return cardDAO;
+        return new JPACardDAO(entityManager.createEntityManager());
     }
 
     public static IUserCardsDAO getUserCardsDAO() {
-        return userCardsDAO;
+        return new JPAUserCardsDAO(entityManager.createEntityManager());
     }
 
     public static IUserDAO getUserDAO() {
-        return userDAO;
+        return new JPAUserDAO(entityManager.createEntityManager());
     }
 
     public static IUserOnlineDAO getUserOnlineDAO() {
-        return userOnlineDAO;
+        return new JPAUserOnlineDAO(entityManager.createEntityManager());
     }
 
     public static UserGameSessionDAO getUserGameSessionDAO() {
-        return userGameSessionDAO;
+        return new JPAUserGameSession(entityManager.createEntityManager());
     }
 
     public static UserSearchGameDAO getUserSearchGameDAO() {
-        return userSearchGameDAO;
+        return new JPAUserSearchGameDAO(entityManager.createEntityManager());
     }
 }

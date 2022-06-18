@@ -1,22 +1,56 @@
 package ua.kpi.cardgame.entities.jpa;
 
-import javax.persistence.Entity;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
-public class UserCard {
-    @OneToOne
+@IdClass(UserCardKey.class)
+@NamedQueries({
+    @NamedQuery(name = "UserCard.findAll", query = "SELECT c FROM UserCard c WHERE c.user = :user AND c.gameSession = :session"),
+})
+public class UserCard implements Serializable {
+    @Id
+    @ManyToOne
     private GameSession gameSession;
-    @OneToOne
+    @Id
+    @ManyToOne
     private User user;
-    @OneToOne
-    private Card Card;
+    @Id
+    @ManyToOne
+    private Card card;
+
+    public UserCard() {
+    }
 
     public UserCard(GameSession gameSession, User user, Card cards) {
         this.gameSession = gameSession;
         this.user = user;
-        this.Card = cards;
+        this.card = cards;
+    }
+
+    public GameSession getGameSession() {
+        return gameSession;
+    }
+
+    public void setGameSession(GameSession gameSession) {
+        this.gameSession = gameSession;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public ua.kpi.cardgame.entities.jpa.Card getCard() {
+        return card;
+    }
+
+    public void setCard(ua.kpi.cardgame.entities.jpa.Card card) {
+        this.card = card;
     }
 
     @Override
@@ -24,12 +58,12 @@ public class UserCard {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserCard userCard = (UserCard) o;
-        return Objects.equals(gameSession, userCard.gameSession) && Objects.equals(user, userCard.user) && Objects.equals(Card, userCard.Card);
+        return Objects.equals(gameSession, userCard.gameSession) && Objects.equals(user, userCard.user) && Objects.equals(card, userCard.card);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(gameSession, user, Card);
+        return Objects.hash(gameSession, user, card);
     }
 
     @Override
@@ -37,7 +71,7 @@ public class UserCard {
         return "UserCards{" +
                 "sessionId=" + gameSession.getSessionId() +
                 ", userId=" + user.getUserId() +
-                ", cardId=" + Card.getCardId() +
+                ", cardId=" + card.getCardId() +
                 '}';
     }
 }

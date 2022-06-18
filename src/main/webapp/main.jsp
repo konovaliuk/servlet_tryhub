@@ -67,6 +67,8 @@
                 document.getElementById("cancel_btn").removeAttribute("hidden");
             }
 
+            console.log("<c:if test='${gameSearch == true}'>true</c:if>");
+            console.log("<c:if test='${gameSearch != true}'>false</c:if>");
             <c:if test='${gameSearch == true}'>startSearching();</c:if>
 
             document.getElementById("search_btn").onclick = async () => {

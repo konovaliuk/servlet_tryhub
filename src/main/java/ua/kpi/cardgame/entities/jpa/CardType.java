@@ -1,7 +1,7 @@
 package ua.kpi.cardgame.entities.jpa;
 
 public enum CardType {
-    IMAGE ("image"), TEXT ("text");
+    IMAGE ("IMAGE"), TEXT ("TEXT");
 
     private final String type;
 

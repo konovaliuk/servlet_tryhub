@@ -29,6 +29,7 @@ public class SearchGameCommand implements ICommand {
                 json.put("result", "error");
             }
         } catch (Exception e) {
+            e.printStackTrace();
             json.put("result", "error");
         }
         req.setAttribute("json_response", json.toJSONString());

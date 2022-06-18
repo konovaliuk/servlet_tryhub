@@ -5,7 +5,7 @@ import ua.kpi.cardgame.entities.UserOnlineStatus;
 import ua.kpi.cardgame.entities.jpa.User;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
+import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -13,16 +13,32 @@ import java.util.Date;
 import java.util.List;
 
 public class JPAUserOnlineDAO implements IUserOnlineDAO {
-    EntityManager entityManager = Persistence.createEntityManagerFactory("jpa").createEntityManager();
+    private final EntityManager entityManager;
+
+    public JPAUserOnlineDAO(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+    public void startTransaction() {
+        EntityTransaction transaction = entityManager.getTransaction();
+        if (!transaction.isActive()) {
+            transaction.begin();
+        }
+    }
 
     @Override
     public void rollbackTransaction() {
-        entityManager.getTransaction().rollback();
+        EntityTransaction transaction = entityManager.getTransaction();
+        if (transaction.isActive()) {
+            transaction.rollback();
+        }
     }
 
     @Override
     public void commitTransaction() throws SQLException {
-        entityManager.getTransaction().commit();
+        EntityTransaction transaction = entityManager.getTransaction();
+        if (transaction.isActive()) {
+            transaction.commit();
+        }
     }
 
     @Override
@@ -32,21 +48,23 @@ public class JPAUserOnlineDAO implements IUserOnlineDAO {
         ua.kpi.cardgame.entities.jpa.UserOnlineStatus userOnlineStatus = new ua.kpi.cardgame.entities.jpa.UserOnlineStatus(
             user, new Timestamp(new Date().getTime())
         );
-        entityManager.getTransaction().begin();
-        entityManager.persist(userOnlineStatus);
-        commitTransaction();
+        try {
+            startTransaction();
+            entityManager.persist(userOnlineStatus);
+            commitTransaction();
+        } catch (Exception e) {
+        }
     }
 
     @Override
     public void setUserOffline(int userId) throws SQLException {
-        TypedQuery<ua.kpi.cardgame.entities.jpa.UserOnlineStatus> query = entityManager.createNamedQuery(
-            "UserOnlineStatus.findById", ua.kpi.cardgame.entities.jpa.UserOnlineStatus.class
-        ).setParameter("userId", userId);
-        List<ua.kpi.cardgame.entities.jpa.UserOnlineStatus> results = query.getResultList();
+        ua.kpi.cardgame.entities.jpa.UserOnlineStatus userOnlineStatus = entityManager.find(
+            ua.kpi.cardgame.entities.jpa.UserOnlineStatus.class, userId
+        );
 
-        if (results.size() == 1) {
-            entityManager.getTransaction().begin();
-            entityManager.remove(results.get(0));
+        if (userOnlineStatus != null) {
+            startTransaction();
+            entityManager.remove(userOnlineStatus);
             commitTransaction();
         }
     }

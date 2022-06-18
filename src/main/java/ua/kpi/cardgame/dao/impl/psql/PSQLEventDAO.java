@@ -1,4 +1,4 @@
-package ua.kpi.cardgame.dao.impl;
+package ua.kpi.cardgame.dao.impl.psql;
 
 import org.postgresql.util.PGInterval;
 import ua.kpi.cardgame.dao.interfaces.EventDAO;

@@ -20,12 +20,10 @@ public class UserService {
             if (userDAO.getUserByLogin(login) == null) {
                 user = userDAO.createUser(login, password);
                 userOnlineDAO.setUserOnline(user.getUserId());
-//                userDAO.commitTransaction();
             } else {
                 return null;
             }
         } catch (SQLException e) {
-//            userDAO.rollbackTransaction();
             e.printStackTrace();
         }
 
@@ -43,10 +41,8 @@ public class UserService {
                 user = null;
             } else if (user != null) {
                 userOnlineDAO.setUserOnline(user.getUserId());
-//                userOnlineDAO.commitTransaction();
             }
         } catch (SQLException e) {
-//            userOnlineDAO.rollbackTransaction();
             e.printStackTrace();
         }
 
@@ -58,9 +54,7 @@ public class UserService {
 
         try {
             userOnlineDAO.setUserOffline(user.getUserId());
-//            userOnlineDAO.commitTransaction();
         } catch (SQLException e) {
-//            userOnlineDAO.rollbackTransaction();
             e.printStackTrace();
         }
     }
@@ -70,9 +64,8 @@ public class UserService {
 
         try {
             userOnlineDAO.setUserOnline(user.getUserId());
-//            userOnlineDAO.commitTransaction();
         } catch (SQLException e) {
-            // pass
+            e.printStackTrace();
         }
     }
 
