@@ -1,6 +1,7 @@
 package ua.kpi.cardgame.services;
 
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import ua.kpi.cardgame.dao.DAOFactory;
 import ua.kpi.cardgame.dao.interfaces.*;
 import ua.kpi.cardgame.entities.*;
@@ -27,10 +28,8 @@ public class GameService {
             } else if ("cancel".equals(action)) {
                 userSearchGameDAO.stopUserSearchGame(user.getUserId());
             }
-//            userSearchGameDAO.commitTransaction();
             return true;
         } catch (SQLException e) {
-//            userSearchGameDAO.rollbackTransaction();
             return false;
         }
     }
@@ -41,7 +40,7 @@ public class GameService {
         }
         if (searchGameAction(user, "search")) {
             searchingUsersCount++;
-            if (searchingUsersCount == 2) {
+            if (searchingUsersCount == 3) {
                 startGame();
             }
             return true;
@@ -66,6 +65,9 @@ public class GameService {
         try {
             Event event = eventDAO.getEventById(gameSession.getEventId());
 
+            System.out.println(gameSession.getEventStartTime().getTime());
+            System.out.println(event.getDuration().toMillis());
+
             if (new Date().getTime() - gameSession.getEventStartTime().getTime() > event.getDuration().toMillis()) {
                 int nextEventID = event.getEventId() % 2 + 1; // we have only two events
 
@@ -88,7 +90,6 @@ public class GameService {
                         );
                     }
                 }
-                gameSessionDAO.commitTransaction();
             }
 
             List<String> cards = userCardsDAO.getUserCards(gameSession.getSessionId(), user.getUserId()).stream()
@@ -108,9 +109,11 @@ public class GameService {
                         if (card == null) {
                             return "null";
                         } else {
-                            return card.toJSON();
+                            JSONObject json = (JSONObject) new JSONParser().parse(card.toJSON());
+                            json.put("user_id", userGameSession.getUserId());
+                            return json.toJSONString();
                         }
-                    } catch (SQLException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                         return null;
                     }
@@ -119,9 +122,10 @@ public class GameService {
             jsonResponse.put("condition", cardDAO.getCardById(gameSession.getConditionId()).toJSON());
             jsonResponse.put("user_cards", cards);
             jsonResponse.put("user_choices", choices);
-            jsonResponse.put("game_session", gameSession.toJSON());
-        } catch (SQLException e) {
-            gameSessionDAO.rollbackTransaction();
+            JSONObject gameSessionJSON = (JSONObject) new JSONParser().parse(gameSession.toJSON());
+            gameSessionJSON.put("time_left", event.getDuration().toMillis() - new Date().getTime() + gameSession.getEventStartTime().getTime());
+            jsonResponse.put("game_session", gameSessionJSON.toJSONString());
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -174,9 +178,7 @@ public class GameService {
                 }
                 userSearchGameDAO.stopUserSearchGame(user.getUserId());
             }
-            gameSessionDAO.commitTransaction();
         } catch (SQLException e) {
-            gameSessionDAO.rollbackTransaction();
             e.printStackTrace();
         }
     }
@@ -189,13 +191,16 @@ public class GameService {
         for (User user : sessionUsers) {
             try {
                 userCardsDAO.deleteAllUserCards(gameSession.getSessionId(), user.getUserId());
-                userGameSessionDAO.deleteAllBySessionId(gameSession.getSessionId());
-                gameSessionDAO.deleteSessionById(gameSession.getSessionId());
-                gameSessionDAO.commitTransaction();
             } catch (SQLException e) {
                 e.printStackTrace();
-                gameSessionDAO.rollbackTransaction();
             }
+        }
+
+        try {
+            userGameSessionDAO.deleteAllBySessionId(gameSession.getSessionId());
+            gameSessionDAO.deleteSessionById(gameSession.getSessionId());
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
         conditions = null;
@@ -243,23 +248,20 @@ public class GameService {
                         );
                     }
                 }
-                userGameSessionDAO.commitTransaction();
             } catch (SQLException e) {
                 e.printStackTrace();
-                userDAO.rollbackTransaction();
             }
         } else {
             try {
                 IUserCardsDAO userCardsDAO = DAOFactory.getUserCardsDAO();
+                System.out.println(new UserGameSession(gameSession.getSessionId(), user.getUserId(), cardId));
                 userGameSessionDAO.updateUserSessionChoice(
                     new UserGameSession(gameSession.getSessionId(), user.getUserId(), cardId), cardId
                 );
                 userCardsDAO.deleteUserCard(new UserCard(gameSession.getSessionId(), user.getUserId(), cardId));
                 userCardsDAO.addUserCard(new UserCard(gameSession.getSessionId(), user.getUserId(), userCards.remove(0).getCardId()));
-                userGameSessionDAO.commitTransaction();
             } catch (SQLException e) {
                 e.printStackTrace();
-                userGameSessionDAO.rollbackTransaction();
             }
         }
 

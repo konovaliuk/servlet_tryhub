@@ -4,13 +4,20 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
+@NamedQueries({
+    @NamedQuery(name = "Card.findAll", query = "SELECT c FROM Card c"),
+    @NamedQuery(name = "Card.findAllByType", query = "SELECT c FROM Card c WHERE c.type = :type")
+})
 public class Card {
     @Id
     @GeneratedValue
     private int cardId;
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private CardType type;
     private String resource;
+
+    public Card() {
+    }
 
     public Card(int cardId, CardType type, String resource) {
         this.cardId = cardId;

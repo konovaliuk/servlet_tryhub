@@ -1,7 +1,7 @@
 package ua.kpi.cardgame;
 
-import ua.kpi.cardgame.dao.impl.PSQLUserDAO;
-import ua.kpi.cardgame.dao.impl.PSQLUserOnlineDAO;
+import ua.kpi.cardgame.dao.impl.psql.PSQLUserDAO;
+import ua.kpi.cardgame.dao.impl.psql.PSQLUserOnlineDAO;
 import ua.kpi.cardgame.entities.User;
 
 import java.sql.SQLException;

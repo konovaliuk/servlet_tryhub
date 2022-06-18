@@ -1,4 +1,4 @@
-package ua.kpi.cardgame.dao.impl;
+package ua.kpi.cardgame.dao.impl.psql;
 
 import ua.kpi.cardgame.connection.ConnectionFactory;
 

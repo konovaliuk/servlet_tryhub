@@ -2,10 +2,7 @@ package ua.kpi.cardgame.entities.jpa;
 
 import org.postgresql.util.PGInterval;
 
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.Duration;
 import java.util.Objects;
 
@@ -14,7 +11,7 @@ public class Event {
     @Id
     @GeneratedValue
     private int eventId;
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private EventName eventName;
     private Duration duration;
 

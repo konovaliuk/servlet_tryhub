@@ -1,4 +1,4 @@
-package ua.kpi.cardgame.dao.impl;
+package ua.kpi.cardgame.dao.impl.psql;
 
 import ua.kpi.cardgame.dao.interfaces.ICardDAO;
 import ua.kpi.cardgame.entities.Card;

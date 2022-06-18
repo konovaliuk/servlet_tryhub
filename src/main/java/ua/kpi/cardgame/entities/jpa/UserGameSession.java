@@ -1,20 +1,22 @@
 package ua.kpi.cardgame.entities.jpa;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import java.io.Serializable;
+import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-public class UserGameSession implements Serializable {
+@IdClass(UserGameSessionKey.class)
+@NamedQueries({
+    @NamedQuery(name = "UserGameSession.findAllBySession", query = "SELECT s FROM UserGameSession s WHERE s.gameSession = :session"),
+    @NamedQuery(name = "UserGameSession.findByUserAndSession", query = "SELECT s FROM UserGameSession s WHERE s.gameSession = :session AND s.user = :user"),
+})
+public class UserGameSession {
     @Id
-    @OneToOne
+    @ManyToOne
     private GameSession gameSession;
     @Id
     @OneToOne
     private User user;
-    @OneToOne
+    @ManyToOne
     private Card userChoice;
 
     public UserGameSession() { }
@@ -67,7 +69,7 @@ public class UserGameSession implements Serializable {
         return "UserGameSession{" +
                 "sessionId=" + gameSession.getSessionId() +
                 ", userId=" + user.getUserId() +
-                ", userChoice=" + userChoice.getCardId() +
+                ", userChoice=" + (userChoice == null? "0" : String.valueOf(userChoice.getCardId())) +
                 '}';
     }
 }

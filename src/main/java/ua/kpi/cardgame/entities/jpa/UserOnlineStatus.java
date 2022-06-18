@@ -7,7 +7,6 @@ import java.util.Objects;
 
 @Entity
 @NamedQueries({
-    @NamedQuery(name = "UserOnlineStatus.findById", query = "SELECT u FROM UserOnlineStatus u WHERE u.user.userId = :userId"),
     @NamedQuery(name = "UserOnlineStatus.findAll", query = "SELECT u FROM UserOnlineStatus u")
 })
 public class UserOnlineStatus implements Serializable {
